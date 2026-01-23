@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,51 +11,42 @@ public class WorldSetupHandler : MonoBehaviour
     private MeshFilter meshFilter;
     private Mesh mesh;
 
-    [SerializeField] private Material land;
-    [SerializeField] private Material ocean;
+    [SerializeField] public Material land;
+    [SerializeField] public Material ocean;
     
     private Vector3[] vertices;
     private int[] triangles;
-    private List<Tile> tiles;
+    public List<Tile> tiles { get; private set; }
     private Dictionary<(Vector3,Vector3), (Tile, Tile)> edges;
     
     private int numPentagons = 12;
     private int numVerticesPerTriangle = 3;
     private int numTrisPerPentagon = 3;
     private int numTrisPerHexagon = 4;
+
+    private bool toRotate = true;
     
-    [SerializeField] private float sphereOffset;
-    [SerializeField] private float xOffset;
-    [SerializeField] private float yOffset;
-    [SerializeField] private float scaleStart;
-    [SerializeField] private float scaleEnd;
-    [SerializeField] private float scaleJump;
-    
-    [SerializeField] private float elevationSlider;
-    [SerializeField] private int numTimesGrowLand;
-    [SerializeField] private int numTimesGrowOcean;
-    [SerializeField] private float maxMinElevation;
-    
-    void Start()
+
+    void Awake()
     {
         getRequiredComponents();
         
         mapTrianglesToTiles();
 
         mapEdgeNeighbours();
-
-        assignLandAndOcean();
-        
-        paintTiles();
     }
 
-    void Update()
+    void Start()
     {
+        paintTiles();
     }
 
     private void FixedUpdate()
     {
-        transform.Rotate(new Vector3(0, 1f, 0));
+        if (toRotate)
+        {
+            transform.Rotate(new Vector3(0, 0.6f, 0));
+        }
     }
     
     private void getRequiredComponents()
@@ -156,7 +148,7 @@ public class WorldSetupHandler : MonoBehaviour
         return (a, b);
     }
     
-    private void paintTiles()
+    public void paintTiles()
     {
         List<int> landMesh = new List<int>();
         List<int> oceanMesh =  new List<int>();
@@ -166,7 +158,7 @@ public class WorldSetupHandler : MonoBehaviour
         {
             if (tile.GetMaterial() == land)
             {
-                landMesh.AddRange(tile.GetTriangles()); //
+                landMesh.AddRange(tile.GetTriangles());
             }
             else
             {
@@ -189,97 +181,8 @@ public class WorldSetupHandler : MonoBehaviour
         meshFilter.mesh = mesh;
     }
 
-    private float CalculateElevation(float perlinValue)
+    public void rotatePlanetToggle()
     {
-        return maxMinElevation * (perlinValue - 0.5f);
-    }
-
-    private void assignLandAndOcean()
-    {
-        INoiseGenerator noiseGenerator = GetComponent<INoiseGenerator>(); 
-        
-        foreach (Tile tile in tiles)
-        {
-            float noise = noiseGenerator.calculateValue(tile.GetCenter(), scaleStart, scaleEnd, scaleJump, xOffset, yOffset);
-            
-            tile.tileStats.elevation = CalculateElevation(noise) + elevationSlider;
-            
-            if (tile.tileStats.elevation < 0)
-            {
-                tile.SetMaterial(ocean);
-            }
-            else
-            {
-                tile.SetMaterial(land);
-            }
-        }
-
-        for (int i = 0; i < numTimesGrowLand; i++)
-        {
-            Queue<Tile> edgeRandomizerTile = new Queue<Tile>(tiles);
-
-            while (edgeRandomizerTile.Count > 0)
-            {
-                Tile tile = edgeRandomizerTile.Dequeue();
-
-                if (tile.GetMaterial() == land)
-                {
-                    continue;
-                }
-
-                int matchingMaterial = 0;
-
-                foreach (Tile neighbour in tile.GetNeighbours())
-                {
-                    if (neighbour.GetMaterial() == land)
-                    {
-                        matchingMaterial++;
-                    }
-                }
-
-                if (Random.value < (matchingMaterial) / (float)tile.GetNeighbours().Count)
-                {
-                    tile.SetMaterial(land);
-                    foreach (Tile readd in tile.GetNeighbours())
-                    {
-                        edgeRandomizerTile.Enqueue(readd);
-                    }
-                }
-            }
-        }
-        
-        for (int i = 0; i < numTimesGrowOcean; i++)
-        {
-            Queue<Tile> edgeRandomizerTile = new Queue<Tile>(tiles);
-
-            while (edgeRandomizerTile.Count > 0)
-            {
-                Tile tile = edgeRandomizerTile.Dequeue();
-
-                if (tile.GetMaterial() == ocean)
-                {
-                    continue;
-                }
-
-                int matchingMaterial = 0;
-
-                foreach (Tile neighbour in tile.GetNeighbours())
-                {
-                    if (neighbour.GetMaterial() == ocean)
-                    {
-                        matchingMaterial++;
-                    }
-                }
-
-                if (Random.value < (matchingMaterial) / (float)tile.GetNeighbours().Count)
-                {
-                    tile.SetMaterial(ocean);
-                    foreach (Tile readd in tile.GetNeighbours())
-                    {
-                        edgeRandomizerTile.Enqueue(readd);
-                    }
-                }
-            }
-        }
+        toRotate = !toRotate;
     }
 }
