@@ -26,7 +26,10 @@ public class WorldSetupHandler : MonoBehaviour
     [SerializeField] private float sphereOffset;
     [SerializeField] private float xOffset;
     [SerializeField] private float yOffset;
-    [SerializeField] private float scale;
+    [SerializeField] private float scaleStart;
+    [SerializeField] private float scaleEnd;
+    [SerializeField] private float scaleJump;
+    
     [SerializeField] private float elevationSlider;
     [SerializeField] private int numTimesGrowLand;
     [SerializeField] private int numTimesGrowOcean;
@@ -47,8 +50,6 @@ public class WorldSetupHandler : MonoBehaviour
 
     void Update()
     {
-        //assignLandAndOcean();
-        
     }
 
     private void FixedUpdate()
@@ -155,14 +156,6 @@ public class WorldSetupHandler : MonoBehaviour
         return (a, b);
     }
     
-    private float CalculatePerlin(float x, float y, float z, float iterator)
-    {
-        return (Mathf.PerlinNoise(scale * (x + xOffset + (sphereOffset * iterator)), scale * (y + yOffset + (sphereOffset * iterator))) +
-                Mathf.PerlinNoise(scale * (y + xOffset + (sphereOffset * iterator)), scale * (x + yOffset + (sphereOffset * iterator))) +
-                Mathf.PerlinNoise(scale * (x + xOffset + (sphereOffset * iterator)), scale * (z + yOffset + (sphereOffset * iterator)))
-                ) / 3f;
-    }
-    
     private void paintTiles()
     {
         List<int> landMesh = new List<int>();
@@ -203,16 +196,13 @@ public class WorldSetupHandler : MonoBehaviour
 
     private void assignLandAndOcean()
     {
+        INoiseGenerator noiseGenerator = GetComponent<INoiseGenerator>(); 
+        
         foreach (Tile tile in tiles)
         {
-            float perlin = 0;
-                
-            for (float i = 1; i < 100; i += 32)
-            {
-                perlin += CalculatePerlin(tile.GetCenter().x, tile.GetCenter().y, tile.GetCenter().z, i) / 4;
-            }
+            float noise = noiseGenerator.calculateValue(tile.GetCenter(), scaleStart, scaleEnd, scaleJump, xOffset, yOffset);
             
-            tile.tileStats.elevation = CalculateElevation(perlin) + elevationSlider;
+            tile.tileStats.elevation = CalculateElevation(noise) + elevationSlider;
             
             if (tile.tileStats.elevation < 0)
             {
