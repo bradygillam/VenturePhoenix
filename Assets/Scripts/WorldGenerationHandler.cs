@@ -35,15 +35,21 @@ public class WorldGenerationHandler : MonoBehaviour
             
             tile.tileStats.elevation = CalculateElevation(noise) + elevationSlider;
             
-            if (tile.tileStats.elevation < 0)
+            if (tile.tileStats.elevation >= 100)
             {
-                tile.SetMaterial(worldSetupHandler.ocean);
+                tile.tileStats.biome = Biome.mountain;
+            }
+            else if (tile.tileStats.elevation >= 0)
+            {
+                tile.tileStats.biome = Biome.land;
             }
             else
             {
-                tile.SetMaterial(worldSetupHandler.land);
+                tile.tileStats.biome = Biome.ocean;
             }
         }
+        
+        worldSetupHandler.paintTiles();
     }
 
     private void useSeed()

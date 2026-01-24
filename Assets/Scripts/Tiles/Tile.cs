@@ -12,8 +12,6 @@ public class Tile
 
     private List<Tile> tileNeighbours;
     
-    private Material material;
-    
     
     public Tile(int[] verticeIndexes, Vector3[] vertexPositions)
     {
@@ -49,15 +47,5 @@ public class Tile
     public void AddNeighbour(Tile neighbourIndex)
     {
         tileNeighbours.Add(neighbourIndex);
-    }
-
-    public void SetMaterial(Material material)
-    {
-        this.material = material;
-    }
-
-    public Material GetMaterial()
-    {
-        return material;
     }
 }

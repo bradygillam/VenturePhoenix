@@ -128,6 +128,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3366656498783010444, guid: 762c56acf5fe82b42920ac6120f5d3e8, type: 3}
+      propertyPath: mountain
+      value: 
+      objectReference: {fileID: 2100000, guid: 6afbad83b3def6c4da187bf69f52dfca, type: 2}
+    - target: {fileID: 3366656498783010444, guid: 762c56acf5fe82b42920ac6120f5d3e8, type: 3}
       propertyPath: scaleEnd
       value: 50
       objectReference: {fileID: 0}
@@ -863,18 +867,6 @@ MonoBehaviour:
       - m_Target: {fileID: 1368976625}
         m_TargetAssemblyTypeName: WorldGenerationHandler, Assembly-CSharp
         m_MethodName: assignLandAndOcean
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1368976624}
-        m_TargetAssemblyTypeName: WorldSetupHandler, Assembly-CSharp
-        m_MethodName: paintTiles
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

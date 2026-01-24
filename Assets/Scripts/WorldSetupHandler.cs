@@ -13,6 +13,7 @@ public class WorldSetupHandler : MonoBehaviour
 
     [SerializeField] public Material land;
     [SerializeField] public Material ocean;
+    [SerializeField] public Material mountain;
     
     private Vector3[] vertices;
     private int[] triangles;
@@ -25,20 +26,28 @@ public class WorldSetupHandler : MonoBehaviour
     private int numTrisPerHexagon = 4;
 
     private bool toRotate = true;
-    
+
+    private Dictionary<Biome, Material> biomeMaterialMap;
+
 
     void Awake()
     {
         getRequiredComponents();
+
+        mapBiomeToMaterials();
         
         mapTrianglesToTiles();
 
         mapEdgeNeighbours();
     }
 
-    void Start()
+    private void mapBiomeToMaterials()
     {
-        paintTiles();
+        biomeMaterialMap = new Dictionary<Biome, Material>();
+        
+        biomeMaterialMap.Add(Biome.ocean, ocean);
+        biomeMaterialMap.Add(Biome.land, land);
+        biomeMaterialMap.Add(Biome.mountain, mountain);
     }
 
     private void FixedUpdate()
@@ -150,33 +159,33 @@ public class WorldSetupHandler : MonoBehaviour
     
     public void paintTiles()
     {
-        List<int> landMesh = new List<int>();
-        List<int> oceanMesh =  new List<int>();
-        mesh.subMeshCount = 2;
+        Dictionary<Biome, List<int>> biomeMeshMap = new Dictionary<Biome, List<int>>();
+        
+        foreach (Biome biome in biomeMaterialMap.Keys)
+        {
+            biomeMeshMap.Add(biome, new List<int>());
+        }
+        
+        mesh.subMeshCount = biomeMeshMap.Count;
         
         foreach (Tile tile in tiles)
         {
-            if (tile.GetMaterial() == land)
-            {
-                landMesh.AddRange(tile.GetTriangles());
-            }
-            else
-            {
-                oceanMesh.AddRange(tile.GetTriangles());
-            }
+            biomeMeshMap[tile.tileStats.biome].AddRange(tile.GetTriangles());
         }
-        
-        mesh.SetTriangles(landMesh, 0);
-        mesh.SetTriangles(oceanMesh, 1);
+
+        int i = 0;
+        Material[] biomeMaterials = new Material[biomeMeshMap.Count];
+        foreach (Biome biome in biomeMeshMap.Keys)
+        {
+            mesh.SetTriangles(biomeMeshMap[biome], i);
+            biomeMaterials[i] = biomeMaterialMap[biome];
+            i++;
+        }
         
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-        
-        meshRenderer.materials = new Material[]
-        {
-            land,
-            ocean
-        };
+
+        meshRenderer.materials = biomeMaterials;
 
         meshFilter.mesh = mesh;
     }
