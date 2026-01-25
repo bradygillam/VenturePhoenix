@@ -25,11 +25,8 @@ public class WorldSetupHandler : MonoBehaviour
     private int numTrisPerPentagon = 3;
     private int numTrisPerHexagon = 4;
 
-    private bool toRotate = true;
-
     private Dictionary<Biome, Material> biomeMaterialMap;
-
-
+    
     void Awake()
     {
         getRequiredComponents();
@@ -48,14 +45,6 @@ public class WorldSetupHandler : MonoBehaviour
         biomeMaterialMap.Add(Biome.ocean, ocean);
         biomeMaterialMap.Add(Biome.land, land);
         biomeMaterialMap.Add(Biome.mountain, mountain);
-    }
-
-    private void FixedUpdate()
-    {
-        if (toRotate)
-        {
-            transform.Rotate(new Vector3(0, 0.6f, 0));
-        }
     }
     
     private void getRequiredComponents()
@@ -188,10 +177,5 @@ public class WorldSetupHandler : MonoBehaviour
         meshRenderer.materials = biomeMaterials;
 
         meshFilter.mesh = mesh;
-    }
-
-    public void rotatePlanetToggle()
-    {
-        toRotate = !toRotate;
     }
 }
