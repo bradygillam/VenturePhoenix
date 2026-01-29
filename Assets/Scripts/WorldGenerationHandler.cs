@@ -11,17 +11,16 @@ public class WorldGenerationHandler : MonoBehaviour
     [SerializeField] private float maxMinElevation;
     
     private INoiseGenerator noiseGenerator;
-    private WorldSetupHandler worldSetupHandler;
     private List<Tile> tiles;
     private int seed;
     private float xOffset;
     private float yOffset;
     
+    private float ASSUMED_PERLIN_AVERAGE = 0.5f;
+    
     void Start()
     {
         noiseGenerator = GetComponent<INoiseGenerator>();
-        worldSetupHandler = GetComponent<WorldSetupHandler>();
-        tiles = worldSetupHandler.tiles;
         assignLandAndOcean();
     }
     
@@ -29,7 +28,7 @@ public class WorldGenerationHandler : MonoBehaviour
     {
         useSeed();
         
-        foreach (Tile tile in tiles)
+        foreach (Tile tile in GameTiles.tiles)
         {
             float noise = noiseGenerator.calculateValue(tile.GetCenter(), scaleStart, scaleEnd, scaleJump, xOffset, yOffset);
             
@@ -49,7 +48,7 @@ public class WorldGenerationHandler : MonoBehaviour
             }
         }
         
-        worldSetupHandler.paintTiles();
+        WorldMesh.paintTiles();
     }
 
     private void useSeed()
@@ -62,9 +61,6 @@ public class WorldGenerationHandler : MonoBehaviour
     
     private float CalculateElevation(float perlinValue)
     {
-        float ASSUMEDPERLINAVERAGE = 0.5f;
-        
-        return maxMinElevation * (perlinValue - ASSUMEDPERLINAVERAGE);
+        return maxMinElevation * (perlinValue - ASSUMED_PERLIN_AVERAGE);
     }
-    
 }

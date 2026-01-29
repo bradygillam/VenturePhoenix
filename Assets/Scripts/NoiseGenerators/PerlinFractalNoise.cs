@@ -16,9 +16,7 @@ public class PerlinFractalNoise : MonoBehaviour, INoiseGenerator
         
         if (scaleStart > scaleEnd)
         {
-            float i = scaleStart;
-            scaleStart = scaleEnd;
-            scaleEnd = scaleStart;
+            (scaleStart, scaleEnd) = (scaleEnd, scaleStart);
         } 
         
         if (scaleStart == scaleEnd)
