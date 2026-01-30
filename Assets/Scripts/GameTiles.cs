@@ -10,19 +10,16 @@ public static class GameTiles
         tiles = new List<Tile>();
     }
 
-    public static Tile getTileByTriangleIndex(int triangleIndex)
+    public static Tile getTileByTriangleNormal(Vector3 triangleNormal)
     {
-        Vector3 triangleCenter = (WorldMesh.verticePositions[triangleIndex] + WorldMesh.verticePositions[triangleIndex + 1] +
-                                  WorldMesh.verticePositions[triangleIndex + 2]) / 3;
-        
         float smallestDistance = float.MaxValue;
         Tile closestTile = null;
         
         foreach (Tile tile in tiles)
         {
-            if (smallestDistance > Vector3.Distance(triangleCenter, tile.GetCenter()))
+            if (smallestDistance > Vector3.Distance(triangleNormal, tile.GetCenter()))
             {
-                smallestDistance = Vector3.Distance(triangleCenter, tile.GetCenter());
+                smallestDistance = Vector3.Distance(triangleNormal, tile.GetCenter());
                 closestTile = tile;
             }
         }
